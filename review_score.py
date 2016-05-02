@@ -4,8 +4,8 @@ import pandas as pd
 import math
 import nltk
 d = pd.DataFrame()
-cities = ["nyc", "boston", "portland", "sf", "la", "seattle", "chicago", "dc", 
-          "montreal", "toronto" ,"sydney", "london", "melbourne"]
+cities = ["nyc", "boston", "chicago", "dc", "sf", "la", "seattle", "portland", 
+          "montreal", "toronto" ,"sydney", "melbourne", "london"]
 # cities = ["nyc", "boston"]
 
 for c in cities:
@@ -66,8 +66,8 @@ from bokeh.models import HoverTool
 from bokeh.plotting import ColumnDataSource, figure, show, output_file
 scores = [1,2,3,4,5,6,7,8,9,10]
 
-colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce",
-          "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+colors = ["#D3EAC9", "#9CD5CD", "#76C7D1", "#3EA7CD", "#3583B8",
+          "#2B60A3", "#213D8E", "#182075", "#131651"]
 
 city = []
 score = []
@@ -109,3 +109,17 @@ p.select_one(HoverTool).tooltips = [
 output_file('review_score.html', title="Self-reference word : Review score")
 
 show(p)      # show the plot
+
+
+tot_score = tot_self_reference_score.sum(1)
+tot_cnt = cnt.sum(1)
+ave_score = np.nan_to_num(tot_score / tot_cnt)
+print ave_score
+
+from bokeh.charts import Bar
+q = Bar(ave_score, title="Self-reference word : Review score", tools=TOOLS)
+
+output_file('review_score_bar.html', title="Self-reference word : Review score")
+
+show(q)
+

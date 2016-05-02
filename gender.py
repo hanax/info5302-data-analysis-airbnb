@@ -19,8 +19,8 @@ from genderizer.genderizer import Genderizer
 # In[73]:
 
 d = pd.DataFrame()
-cities = ["nyc", "boston", "portland", "sf", "la", "seattle", "chicago", "dc", 
-          "montreal", "toronto" ,"sydney", "london", "melbourne"]
+cities = ["nyc", "boston", "chicago", "dc", "sf", "la", "seattle", "portland", 
+          "montreal", "toronto" ,"sydney", "melbourne", "london"]
 # cities = ["nyc", "london"]
 for c in cities:
     tmp_d = pd.read_csv('listings_' + c + '.csv',sep=',',dtype=pd.np.str)
@@ -126,8 +126,8 @@ from bokeh.io import output_notebook
 
 scores = range(1,4)
 
-colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce",
-          "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+colors = ["#D3EAC9", "#9CD5CD", "#76C7D1", "#3EA7CD", "#3583B8",
+          "#2B60A3", "#213D8E", "#182075", "#131651"]
 
 city = []
 score = []
@@ -156,7 +156,7 @@ p.axis.axis_line_color = None
 p.axis.major_tick_line_color = None
 p.axis.major_label_text_font_size = "10pt"
 p.axis.major_label_standoff = 0
-p.xaxis.major_label_orientation = pi/3
+# p.xaxis.major_label_orientation = pi/3
 
 p.rect("score", "city", width=1, height=1, source=source,
        color="color", line_color=None)
@@ -173,5 +173,16 @@ show(p)
 
 # In[ ]:
 
+tot_score = tot_self_reference_score.sum(1)
+tot_cnt = cnt.sum(1)
+ave_score = np.nan_to_num(tot_score / tot_cnt)
+print ave_score
+
+from bokeh.charts import Bar
+q = Bar(ave_score, title="Self-reference word : Gender", tools=TOOLS)
+
+output_file('gender_bar.html', title="Self-reference word : Gender")
+
+show(q)
 
 

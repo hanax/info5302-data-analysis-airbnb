@@ -4,8 +4,8 @@ import pandas as pd
 import math
 import nltk
 d = pd.DataFrame()
-cities = ["nyc", "boston", "portland", "sf", "la", "seattle", "chicago", "dc", 
-          "montreal", "toronto" ,"sydney", "london", "melbourne"]
+cities = ["nyc", "boston", "chicago", "dc", "sf", "la", "seattle", "portland", 
+          "montreal", "toronto" ,"sydney", "melbourne", "london"]
 # cities = ["nyc", "boston"]
 
 for c in cities:
@@ -41,23 +41,23 @@ for sents in desc_sent:
 
 d = d.join(pd.DataFrame({'self_reference_score': self_reference_score}))
 
-tot_self_reference_score = pd.DataFrame(data=np.zeros((30, len(cities))), columns=cities)
-cnt = pd.DataFrame(data=np.zeros((30, len(cities))), columns=cities)
-ave_self_reference_score = pd.DataFrame(data=np.zeros((30, len(cities))), columns=cities)
+tot_self_reference_score = pd.DataFrame(data=np.zeros((60, len(cities))), columns=cities)
+cnt = pd.DataFrame(data=np.zeros((60, len(cities))), columns=cities)
+ave_self_reference_score = pd.DataFrame(data=np.zeros((60, len(cities))), columns=cities)
 
 for i,score in enumerate(d['number_of_reviews']):
-    tot_self_reference_score[d['listing_city'][i]][min(int(score)/2, 29)] += d['self_reference_score'][i]
-    cnt[d['listing_city'][i]][min(int(score)/2, 29)] += 1
+    tot_self_reference_score[d['listing_city'][i]][min(int(score), 59)] += d['self_reference_score'][i]
+    cnt[d['listing_city'][i]][min(int(score), 59)] += 1
 
 print "\n"
 print "number_of_reviews\taverage_self_reference_score"
 for c in cities:
     print c
-    for i in range(30):
+    for i in range(60):
         ave_self_reference_score[c][i] = 0
         if float(cnt[c][i]) > 0:
             ave_self_reference_score[c][i] = float(tot_self_reference_score[c][i])/int(cnt[c][i])
-            print i*2, "\t\t\t", ave_self_reference_score[c][i]
+            print i, "\t\t\t", ave_self_reference_score[c][i]
 
 from math import pi
 
@@ -65,10 +65,10 @@ from bokeh.models import HoverTool
 from bokeh.plotting import ColumnDataSource, figure, show, output_file
 from bokeh.io import output_notebook
 
-scores = range(2,62,2)
+scores = range(1,61)
 
-colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce",
-          "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+colors = ["#D3EAC9", "#9CD5CD", "#76C7D1", "#3EA7CD", "#3583B8",
+          "#2B60A3", "#213D8E", "#182075", "#131651"]
 
 city = []
 score = []
@@ -77,9 +77,9 @@ rate = []
 for c in cities:
     for s in scores:
         city.append(c)
-        score.append(s/2)
-        rate.append(ave_self_reference_score[c][s/2-1])
-        color.append(colors[min(max(int((ave_self_reference_score[c][s/2-1]*2-0.15)*80/3), 0), 8)])
+        score.append(s)
+        rate.append(ave_self_reference_score[c][s-1])
+        color.append(colors[min(max(int((ave_self_reference_score[c][s-1]*2-0.15)*80/3), 0), 8)])
 
 source = ColumnDataSource(
     data=dict(city=city, score=score, color=color, rate=rate)
@@ -110,3 +110,16 @@ p.select_one(HoverTool).tooltips = [
 output_file('review_number.html', title="Self-reference word : Review number")
 
 show(p)
+
+
+tot_score = tot_self_reference_score.sum(1)
+tot_cnt = cnt.sum(1)
+ave_score = np.nan_to_num(tot_score / tot_cnt)
+print ave_score
+
+from bokeh.charts import Bar
+q = Bar(ave_score, title="Self-reference word : Review number", tools=TOOLS)
+
+output_file('review_number_bar.html', title="Self-reference word : Review number")
+
+show(q)
